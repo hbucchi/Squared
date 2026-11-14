@@ -633,6 +633,11 @@
     focusGrid();
   }
   function focusGrid() {
+    if (App.touch) {
+      const a = document.activeElement;
+      if (a && a !== document.body && a.blur) a.blur();
+      return;
+    }
     const k = el.keySink;
     if (document.activeElement !== k) k.focus({ preventScroll: true });
     k.value = ' ';
@@ -904,6 +909,10 @@
       return;
     }
     if (App.editing) commitEdit();
+    if (p.kind === 'cell' && App.touch && !isMulti() && App.active.r === p.r && App.active.c === p.c) {
+      startEdit();
+      return;
+    }
     if (p.kind === 'cell') {
       selectCell(p.r, p.c, e.shiftKey);
       App.drag = { type: 'select' };
@@ -1173,6 +1182,9 @@
     rows.forEach((row, i) => row.forEach((v, j) => changes.push({ sheet: App.sheet, r: sel.r1 + i, c: sel.c1 + j, raw: v })));
     applyChanges(changes);
     setSel({ r: sel.r1, c: sel.c1 }, { r: sel.r1 + rows.length - 1, c: sel.c1 + width - 1 }, { r: sel.r1, c: sel.c1 });
+  }
+  function copyToSystem(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).catch(() => {});
   }
   async function pasteFromMenu() {
     try {
@@ -1719,8 +1731,8 @@
     const rs = rows > 1 ? rows + ' rows' : 'row';
     const cs = cols > 1 ? cols + ' columns' : 'column';
     showMenu(e.clientX, e.clientY, [
-      { label: 'Cut', key: 'Ctrl+X', action: () => { if (document.execCommand('cut') === false) doCopy(true); } },
-      { label: 'Copy', key: 'Ctrl+C', action: () => { if (document.execCommand('copy') === false) doCopy(false); } },
+      { label: 'Cut', key: 'Ctrl+X', action: () => copyToSystem(doCopy(true)) },
+      { label: 'Copy', key: 'Ctrl+C', action: () => copyToSystem(doCopy(false)) },
       { label: 'Paste', key: 'Ctrl+V', action: pasteFromMenu },
       null,
       { label: 'Insert ' + rs + ' above', action: () => insertRows(false) },
@@ -1808,6 +1820,9 @@
   /* Wiring                                                             */
   /* ================================================================== */
   function bind() {
+    // Remember whether the last interaction was a finger, so focus/keyboard behave sensibly on phones.
+    document.addEventListener('pointerdown', (e) => { App.touch = e.pointerType === 'touch' || e.pointerType === 'pen'; }, true);
+    document.addEventListener('keydown', () => { if (App.touch && !App.editing && document.activeElement === document.body) App.touch = false; }, true);
     // Grid mouse & keyboard
     el.grid.addEventListener('mousedown', onGridMouseDown);
     el.grid.addEventListener('dblclick', (e) => {
@@ -1996,6 +2011,10 @@
     }
     if (!restored) setWorkbook(sampleWorkbook(), 'Sample', null);
     focusGrid();
+    // When served over http(s), a service worker caches the app so it keeps working offline.
+    if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+      navigator.serviceWorker.register('sw.js').catch((e) => console.warn('Offline cache unavailable', e));
+    }
     // Expose for debugging in the browser console.
     window.LocalCalc = App;
   }

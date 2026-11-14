@@ -2,7 +2,28 @@
 
 A spreadsheet that runs entirely on your computer: no server, no install, no network.
 
-**To run it:** open `index.html` in Chrome, Edge, Firefox or Safari (double-click the file).
+## Getting it on your devices (100% offline)
+
+There are two options. Both run entirely on your device, and nothing you type is ever sent anywhere.
+
+**A. Single file: PC, Mac, Linux, Android.**
+Download `LocalCalc.html` (from the hosted app, or build it with `npm run build`).
+
+- **On a computer:** double-click it.
+- **On Android:** open it with Chrome.
+
+It's one file with everything inside it, so you can copy it to a USB stick and it still works.
+
+**B. Install as an app: phone, tablet, PC.**
+Open the hosted version once, then install it:
+
+- **Android (Chrome):** ⋮ menu → *Install app* / *Add to Home screen*.
+- **iPhone/iPad (Safari):** Share → *Add to Home Screen*.
+- **Windows/Mac (Chrome/Edge):** the install icon in the address bar.
+
+After that it opens from its own icon and works with no internet, including flight mode.
+
+**Running from source:** open `index.html` directly, or run `npm run build` to produce `dist/`.
 
 Your work is autosaved in the browser. **File → Save** (Ctrl+S) writes a `.lcalc` file to disk.
 In Chrome and Edge, later saves go straight back to the same file.
@@ -28,6 +49,7 @@ In Chrome and Edge, later saves go straight back to the same file.
 - **Structure:** insert or delete rows and columns. Every formula that refers to them is rewritten, just like in Excel.
 - **Files:** save/open `.lcalc` (JSON), import CSV as a new sheet, export a sheet as CSV.
 - **Undo/redo** for everything.
+- **Touch:** tap to select, tap again to edit, long-press for the menu.
 
 ## How it is built
 
@@ -38,6 +60,8 @@ js/format.js     number/date formats and input parsing ("12%" → 0.12)
 js/engine.js     workbook model, dependency graph, recalculation, insert/delete
 js/io.js         CSV/TSV
 js/app.js        the user interface
+sw.js            service worker: caches the app for offline use when installed
+build.js         produces dist/LocalCalc.html (single file) and dist/web/ (installable app)
 ```
 
 Run the engine tests with `npm test` (requires Node 18+).
@@ -53,4 +77,4 @@ Run the engine tests with `npm test` (requires Node 18+).
 - Dynamic arrays (`FILTER`, `SORT`, `UNIQUE`)
 - Conditional formatting
 - Named ranges
-- Packaging as a desktop app (Electron/Tauri)
+- Native installers (Electron/Tauri for desktop, Capacitor for app stores)

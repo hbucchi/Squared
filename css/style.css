@@ -19,7 +19,7 @@ body {
   overflow: hidden;
 }
 button, select, input { font: inherit; color: inherit; }
-#app { display: flex; flex-direction: column; height: 100vh; }
+#app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
 
 /* ---------- title bar & menus ---------- */
 .titlebar {
@@ -166,3 +166,19 @@ button, select, input { font: inherit; color: inherit; }
   padding: 8px 16px; border-radius: 6px; font-size: 13px; box-shadow: 0 6px 20px rgba(0,0,0,.25);
 }
 #keySink { position: fixed; top: 0; left: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none; border: 0; padding: 0; resize: none; }
+
+/* ---------- phones & small screens ---------- */
+@media (max-width: 760px) {
+  .toolbar { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .toolbar > * { flex: none; }
+  .doc-title #saveState { display: none; }
+  #nameBox { width: 64px; }
+  #status { gap: 8px; padding: 0 6px; }
+  #findBar { top: auto; bottom: 44px; left: 8px; right: 8px; }
+  #findInput { flex: 1; width: auto; }
+}
+@media (pointer: coarse) {
+  #fillHandle { width: 11px; height: 11px; }
+  .menu button { padding: 10px 16px; }
+  .tab { padding: 0 18px; }
+}
