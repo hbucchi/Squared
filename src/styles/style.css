@@ -81,7 +81,7 @@ button, select, input { font: inherit; color: inherit; }
   white-space: pre; overflow: hidden; text-overflow: clip; vertical-align: bottom; cursor: cell;
 }
 #grid td.spill { overflow: visible; }
-#grid td.spill span { display: inline-block; overflow: hidden; vertical-align: bottom; white-space: pre; }
+#grid td.spill span { display: inline-block; overflow: hidden; vertical-align: bottom; white-space: pre; pointer-events: none; }
 #grid td.wrap { white-space: pre-wrap; word-break: break-word; }
 #grid td.sel { box-shadow: inset 0 0 0 9999px var(--accent-soft); }
 #grid th {

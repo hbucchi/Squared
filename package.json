@@ -1,10 +1,24 @@
 {
-  "name": "localcalc",
+  "name": "squared",
   "version": "0.1.0",
   "private": true,
-  "description": "An offline spreadsheet that runs in the browser with no dependencies",
+  "description": "An offline spreadsheet for desktop and mobile",
   "scripts": {
-    "test": "node --test tests/*.test.js",
-    "build": "node build.js"
-  }
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --port 4173 --strictPort",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "check": "npm run typecheck && npm test && npm run build && npm run test:e2e"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/node": "22.20.5",
+    "typescript": "6.0.2",
+    "vite": "8.3.8",
+    "vitest": "5.1.0"
+  },
+  "type": "module"
 }
