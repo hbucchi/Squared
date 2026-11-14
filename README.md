@@ -23,10 +23,7 @@ Open the hosted version once, then install it:
 
 After that it opens from its own icon and works with no internet, including flight mode.
 
-**Running from source:** open `index.html` directly, or run `npm run build` to produce `dist/`.
-
-Your work is autosaved in the browser. **File → Save** (Ctrl+S) writes a `.lcalc` file to disk.
-In Chrome and Edge, later saves go straight back to the same file.
+**Building it yourself:** `npm install`, then `npm run build`. This produces `dist/LocalCalc.html` (the single file) and `dist/web/` (the installable app).
 
 ## What works today
 
@@ -53,23 +50,41 @@ In Chrome and Edge, later saves go straight back to the same file.
 
 ## How it is built
 
+The code is TypeScript in strict mode. There are no runtime dependencies; the tools below are only used for development.
+
 ```
-js/formula.js    tokenizer → parser (AST) → evaluator, plus value coercion rules
-js/functions.js  the function library
-js/format.js     number/date formats and input parsing ("12%" → 0.12)
-js/engine.js     workbook model, dependency graph, recalculation, insert/delete
-js/io.js         CSV/TSV
-js/app.js        the user interface
-sw.js            service worker: caches the app for offline use when installed
-build.js         produces dist/LocalCalc.html (single file) and dist/web/ (installable app)
+src/engine/              the spreadsheet engine (no browser code; runs anywhere)
+  tokenizer.ts           formula text → tokens
+  parser.ts              tokens → syntax tree (recursive descent)
+  evaluator.ts           syntax tree → value
+  values.ts              value types and coercion rules (text ↔ number ↔ boolean)
+  functions/             the function library, one file per category
+  workbook.ts            sheets, the dependency graph, recalculation, insert/delete
+  format.ts, input.ts    number/date formats; understanding what was typed
+  dates.ts, csv.ts       date serial numbers; CSV/TSV
+src/ui/app.ts            the user interface
+src/sw.template.js       service worker (offline cache), completed at build time
+public/                  manifest and icons
+tests/engine/            engine tests (Vitest)
+tests/e2e/               browser tests that use the app like a person (Playwright)
 ```
 
-Run the engine tests with `npm test` (requires Node 18+).
+| Command | What it does |
+|---|---|
+| `npm run dev` | Start a local development server with live reload |
+| `npm test` | Run the engine tests (~400) |
+| `npm run test:e2e` | Run the browser tests against the production build (desktop + phone) |
+| `npm run typecheck` | Type-check everything |
+| `npm run build` | Type-check and build `dist/` |
+| `npm run check` | Run everything, as the CI does |
+
+Every push runs the same checks on GitHub Actions; pushes to `main` are then published to GitHub Pages.
 
 ## Ideas for next steps
 
 - `.xlsx` import/export
-- Virtualised rendering for 100k+ rows
+- Canvas-based, virtualised grid for 100k+ rows (next stage of the plan)
+- Calculation engine in Rust compiled to WebAssembly
 - Charts
 - Freeze panes
 - Borders and merged cells
