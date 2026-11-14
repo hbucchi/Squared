@@ -1,0 +1,9 @@
+{
+  "name": "localcalc",
+  "version": "0.1.0",
+  "private": true,
+  "description": "An offline spreadsheet that runs in the browser with no dependencies",
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  }
+}

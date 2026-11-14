@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LocalCalc</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%233b5bdb'/%3E%3Cpath d='M3 5.5h10M3 8.5h10M3 11.5h10M6.5 3v10' stroke='white' stroke-width='1.2'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+  <header class="titlebar">
+    <div class="menu-wrap">
+      <button class="menu-btn" data-menu="file">File</button>
+      <div class="menu" id="menu-file" hidden>
+        <button data-cmd="new">New workbook</button>
+        <button data-cmd="open">Open… <kbd>Ctrl+O</kbd></button>
+        <button data-cmd="save">Save <kbd>Ctrl+S</kbd></button>
+        <button data-cmd="saveAs">Save as…</button>
+        <hr>
+        <button data-cmd="importCsv">Import CSV as new sheet…</button>
+        <button data-cmd="exportCsv">Export sheet as CSV</button>
+        <hr>
+        <button data-cmd="sample">Open sample workbook</button>
+      </div>
+    </div>
+    <div class="menu-wrap">
+      <button class="menu-btn" data-menu="edit">Edit</button>
+      <div class="menu" id="menu-edit" hidden>
+        <button data-cmd="undo">Undo <kbd>Ctrl+Z</kbd></button>
+        <button data-cmd="redo">Redo <kbd>Ctrl+Y</kbd></button>
+        <hr>
+        <button data-cmd="fillDown">Fill down <kbd>Ctrl+D</kbd></button>
+        <button data-cmd="fillRight">Fill right <kbd>Ctrl+R</kbd></button>
+        <button data-cmd="clearContents">Clear contents <kbd>Del</kbd></button>
+        <button data-cmd="clearFormats">Clear formats</button>
+        <hr>
+        <button data-cmd="find">Find… <kbd>Ctrl+F</kbd></button>
+      </div>
+    </div>
+    <div class="menu-wrap">
+      <button class="menu-btn" data-menu="insert">Insert</button>
+      <div class="menu" id="menu-insert" hidden>
+        <button data-cmd="insertRowAbove">Row above</button>
+        <button data-cmd="insertRowBelow">Row below</button>
+        <button data-cmd="insertColLeft">Column left</button>
+        <button data-cmd="insertColRight">Column right</button>
+        <hr>
+        <button data-cmd="deleteRow">Delete row(s)</button>
+        <button data-cmd="deleteCol">Delete column(s)</button>
+        <hr>
+        <button data-cmd="addSheet">New sheet</button>
+      </div>
+    </div>
+    <div class="menu-wrap">
+      <button class="menu-btn" data-menu="help">Help</button>
+      <div class="menu" id="menu-help" hidden>
+        <button data-cmd="shortcuts">Keyboard shortcuts</button>
+        <button data-cmd="functions">Function list</button>
+      </div>
+    </div>
+    <div class="doc-title"><span id="docName">Untitled</span><span id="saveState"></span></div>
+  </header>
+
+  <div class="toolbar" role="toolbar">
+    <button data-cmd="undo" title="Undo (Ctrl+Z)">↶</button>
+    <button data-cmd="redo" title="Redo (Ctrl+Y)">↷</button>
+    <span class="sep"></span>
+    <select id="fontSize" title="Font size">
+      <option value="">11</option><option>9</option><option>10</option><option>12</option><option>14</option>
+      <option>16</option><option>18</option><option>24</option><option>32</option>
+    </select>
+    <button data-cmd="bold" title="Bold (Ctrl+B)"><b>B</b></button>
+    <button data-cmd="italic" title="Italic (Ctrl+I)"><i>I</i></button>
+    <button data-cmd="underline" title="Underline (Ctrl+U)"><u>U</u></button>
+    <button data-cmd="strike" title="Strikethrough"><s>S</s></button>
+    <label class="color-btn" title="Text color"><span class="swatch-a">A</span><input type="color" id="textColor" value="#c92a2a"></label>
+    <label class="color-btn" title="Fill color"><span class="swatch-fill">▇</span><input type="color" id="fillColor" value="#fff3bf"></label>
+    <button data-cmd="noFill" title="No fill">⌀</button>
+    <span class="sep"></span>
+    <button data-cmd="alignLeft" title="Align left"><svg viewBox="0 0 16 16"><path d="M2 3h12M2 6.5h8M2 10h12M2 13.5h8"/></svg></button>
+    <button data-cmd="alignCenter" title="Center"><svg viewBox="0 0 16 16"><path d="M2 3h12M4 6.5h8M2 10h12M4 13.5h8"/></svg></button>
+    <button data-cmd="alignRight" title="Align right"><svg viewBox="0 0 16 16"><path d="M2 3h12M6 6.5h8M2 10h12M6 13.5h8"/></svg></button>
+    <button data-cmd="wrap" title="Wrap text">↵</button>
+    <span class="sep"></span>
+    <select id="numFormat" title="Number format">
+      <option value="General">General</option>
+      <option value="#,##0.00">Number</option>
+      <option value="$#,##0.00">Currency ($)</option>
+      <option value="€#,##0.00">Currency (€)</option>
+      <option value="0.00%">Percent</option>
+      <option value="0.00E+00" disabled hidden>Scientific</option>
+      <option value="yyyy-mm-dd">Date (ISO)</option>
+      <option value="dd/mm/yyyy">Date (d/m/y)</option>
+      <option value="mm/dd/yyyy">Date (m/d/y)</option>
+      <option value="hh:mm">Time</option>
+      <option value="@">Text</option>
+      <option value="custom" disabled>Custom</option>
+    </select>
+    <button data-cmd="fmtPercent" title="Percent style">%</button>
+    <button data-cmd="fmtThousands" title="Thousands separator">,</button>
+    <button data-cmd="decInc" title="More decimals">.0→</button>
+    <button data-cmd="decDec" title="Fewer decimals">←.0</button>
+    <span class="sep"></span>
+    <button data-cmd="autosum" title="AutoSum (Alt+=)">Σ</button>
+    <button data-cmd="functions" title="Insert function"><i>fx</i></button>
+  </div>
+
+  <div class="formula-bar">
+    <input id="nameBox" spellcheck="false" autocomplete="off" title="Name box — type a cell like B12 and press Enter">
+    <span class="fx">fx</span>
+    <input id="formulaInput" spellcheck="false" autocomplete="off">
+  </div>
+
+  <div id="gridWrap">
+    <div id="gridInner">
+      <table id="grid"></table>
+      <div id="selBox" class="overlay"></div>
+      <div id="clipBox" class="overlay" hidden></div>
+      <div id="pointBox" class="overlay" hidden></div>
+      <div id="fillBox" class="overlay" hidden></div>
+      <div id="fillHandle"></div>
+      <textarea id="editor" spellcheck="false" wrap="off" hidden></textarea>
+      <div id="acList" hidden></div>
+      <div id="fnTip" hidden></div>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <button id="addSheet" title="New sheet">+</button>
+    <div id="tabs"></div>
+    <div id="status"></div>
+  </div>
+
+  <div id="findBar" hidden>
+    <input id="findInput" placeholder="Find in sheet" spellcheck="false">
+    <span id="findInfo"></span>
+    <button data-cmd="findPrev" title="Previous (Shift+Enter)">↑</button>
+    <button data-cmd="findNext" title="Next (Enter)">↓</button>
+    <button data-cmd="findClose" title="Close (Esc)">✕</button>
+  </div>
+
+  <div id="ctxMenu" class="menu" hidden></div>
+  <div id="dialog" hidden><div class="dialog-box"><div id="dialogBody"></div><button id="dialogClose">Close</button></div></div>
+  <div id="toast" hidden></div>
+  <textarea id="keySink" aria-hidden="true" tabindex="-1"></textarea>
+  <input type="file" id="fileInput" hidden accept=".lcalc,.json,.csv,.tsv,.txt">
+</div>
+
+<script src="js/formula.js"></script>
+<script src="js/format.js"></script>
+<script src="js/functions.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/io.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
